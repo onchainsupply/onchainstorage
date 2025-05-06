@@ -1,21 +1,94 @@
-# 📦 @onchainsupply/storage
+# @onchainsupply/storage
 
-> A lightweight, composable Solidity library for encoding, decoding, and hashing onchain asset data — the foundation of trustless, content-addressed smart assets.
+A Solidity-based library for decentralized, extensible, and programmable content storage. Designed for projects that want to go **fully onchain** with human-readable, media-rich assets that are composable, tokenizable, and monetizable.
 
----
+## 🌐 Overview
 
-## ✨ Overview
+`@onchainsupply/storage` provides:
 
-`OnChainCodec` is a reusable smart contract utility library developed by **OnChainSupply**, built to support fully onchain asset storage, deterministic deployment, and tokenization. It is designed for projects building dynamic NFTs, decentralized media, file-bound token systems, and smart asset protocols.
+- Modular, gas-efficient smart contracts to store and stream onchain files in chunks
+- Access models (open, capped, pay-per-use, whitelist)
+- RFC 2397-compliant base64 streaming via `OnChainCodec`
+- Extensible base contract `OnChainStorage`
 
-This package enables:
-- ✅ Base64 encoding for byte content (tokenURI-ready)
-- 🔁 Content hashing via keccak256
-- 🧩 Modular plug-in for onchain file storage and NFT metadata renderers
-
----
-
-## 🧪 Installation
+## 📦 Install
 
 ```bash
 npm install @onchainsupply/storage
+```
+
+## 🏗 Contracts
+
+### 🔹 OnChainStorage (Abstract)
+
+The core contract used for storing finalized, chunked byte streams onchain.
+
+```solidity
+function extend(bytes[] calldata data) external onlyOwner;
+function finalize() external onlyOwner;
+function purge() external onlyOwner;
+function assemble() external view returns (bytes memory);
+function stream() external view returns (string memory);
+```
+
+Use this for building advanced content logic.
+
+### 🔸 Content Types
+
+Each of these extends `OnChainStorage` and implements a usage/access model.
+
+| Contract           | Description                          |
+| ------------------ | ------------------------------------ |
+| `BasicContent`     | Unlimited use, public view access    |
+| `CappedContent`    | Use limited by `maxUsage`            |
+| `PayPerUseContent` | Requires ETH payment per access      |
+| `WhitelistContent` | Only approved addresses may use/view |
+
+### 🔸 Interface
+
+```solidity
+interface IOnChainStorage {
+  function chunkCount() external view returns (uint256);
+  function chunks(uint256 index) external view returns (bytes memory);
+  function finalized() external view returns (bool);
+  function assemble() external view returns (bytes memory);
+  function stream() external view returns (string memory);
+  function info() external view returns (
+    string memory name,
+    string memory version,
+    uint256 createdAt,
+    string memory description);
+}
+```
+
+## 🧰 Codec Library
+
+`OnChainCodec` provides standard base64 encoders for content:
+
+```solidity
+OnChainCodec.encodeOctetStream(bytes);
+OnChainCodec.encodeSVG(string);
+OnChainCodec.encodeJSON(string);
+OnChainCodec.encodeHTML(string);
+OnChainCodec.encodeText(string);
+```
+
+## 🧪 Testing
+
+Test scripts (in `test/store.js`) verify:
+
+- Uploading and assembling chunks
+- Finalization logic
+- Stream URI formatting
+- Gated `use()` behavior for each model
+
+## 📄 License
+
+- Core contracts (`OnChainStorage`, `OnChainCodec`) are licensed under **Apache-2.0**
+- Content templates (`BasicContent`, `CappedContent`, etc.) are licensed under **MIT**
+
+You may use and extend each component independently according to its license terms.
+
+---
+
+Built with ❤️ by [OnChainSupply](https://onchainsupply.net)

@@ -7,8 +7,13 @@ import {OnChainStorage} from "../OnChainStorage.sol";
 /// @title WhitelistContent
 /// @notice Content restricted to a whitelist of allowed addresses
 contract WhitelistContent is OnChainStorage {
-    uint256 public usageCount;
-    mapping(address => bool) public whitelist;
+    uint256 internal usageCount;
+    mapping(address => bool) internal whitelist;
+
+    modifier onlyWhitelisted() {
+        require(whitelist[msg.sender], "Not whitelisted");
+        _;
+    }
 
     constructor(
         bytes memory chunk,
@@ -24,13 +29,51 @@ contract WhitelistContent is OnChainStorage {
         whitelist[user] = false;
     }
 
-    function use() external returns (bool) {
-        require(whitelist[msg.sender], "Not whitelisted");
+    function isWhitelisted(address user) external view returns (bool) {
+        return whitelist[user];
+    }
+
+    function getUsageCount() external view returns (uint256) {
+        return usageCount;
+    }
+
+    function use() external onlyWhitelisted returns (bool) {
         usageCount++;
         return true;
     }
 
     function authorizeViewer() internal view override {
         require(whitelist[msg.sender], "Access denied");
+    }
+
+    /// @notice Get content metadata (whitelist restricted)
+    function getInfo() external view onlyWhitelisted returns (string memory name, string memory version, uint256 createdAt, string memory description) {
+        return (info.name, info.version, info.createdAt, info.description);
+    }
+
+    /// @notice Get content assembly (whitelist restricted)
+    function getContent() external view onlyWhitelisted returns (bytes memory) {
+        return assemble();
+    }
+
+    /// @notice Get content as data URI (whitelist restricted)
+    function getContentURI() external view onlyWhitelisted returns (string memory) {
+        return stream();
+    }
+
+    /// @notice Get chunk count (whitelist restricted)
+    function getChunkCount() external view onlyWhitelisted returns (uint256) {
+        return chunkCount;
+    }
+
+    /// @notice Get chunk at specific index (whitelist restricted)
+    function getChunk(uint256 index) external view onlyWhitelisted returns (bytes memory) {
+        require(index < chunkCount, "Invalid chunk index");
+        return chunks[index];
+    }
+
+    /// @notice Check if content is finalized (whitelist restricted)
+    function isFinalized() external view onlyWhitelisted returns (bool) {
+        return finalized;
     }
 }

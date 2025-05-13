@@ -8,13 +8,13 @@ import {OnChainCodec} from "./utils/OnChainCodec.sol";
 /// @notice Abstract base contract for managing and storing finalized onchain content in chunked form.
 abstract contract OnChainStorage is Ownable {
     /// @notice Tracks the number of content chunks appended
-    uint256 public chunkCount;
+    uint256 internal chunkCount;
 
     /// @notice Mapping from chunk index to actual chunk data
-    mapping(uint256 => bytes) public chunks;
+    mapping(uint256 => bytes) internal chunks;
 
     /// @notice Flag to lock the content against further modification
-    bool public finalized;
+    bool internal finalized;
 
     /// @notice Metadata container describing the content
     struct Info {
@@ -25,7 +25,7 @@ abstract contract OnChainStorage is Ownable {
     }
 
     /// @notice Public content metadata
-    Info public info;
+    Info internal info;
 
     /// @dev Emitted when content metadata is updated
     event InfoUpdated(string name, string version, string description);
@@ -112,7 +112,7 @@ abstract contract OnChainStorage is Ownable {
     /// @notice Concatenates all content chunks into one complete byte array
     /// @return output Final assembled byte stream
     function assemble()
-        public
+        internal
         view
         virtual
         authorized
@@ -127,7 +127,7 @@ abstract contract OnChainStorage is Ownable {
     /// @notice Encodes full content as base64 RFC 2397 octet-stream data URI
     /// @return base64Stream Base64-encoded data URI string
     function stream()
-        public
+        internal
         view
         virtual
         authorized

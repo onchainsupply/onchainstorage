@@ -7,7 +7,7 @@ A Solidity-based library for decentralized, extensible, and programmable content
 `@onchainsupply/storage` provides:
 
 - Modular, gas-efficient smart contracts to store and stream onchain files in chunks
-- Access models (open, capped, pay-per-use, whitelist)
+- Access models (open, capped, pay-per-use, whitelist, and combined models)
 - RFC 2397-compliant base64 streaming via `OnChainCodec`
 - Extensible base contract `OnChainStorage`
 
@@ -27,8 +27,8 @@ The core contract used for storing finalized, chunked byte streams onchain.
 function extend(bytes[] calldata data) external onlyOwner;
 function finalize() external onlyOwner;
 function purge() external onlyOwner;
-function assemble() external view returns (bytes memory);
-function stream() external view returns (string memory);
+function assemble() internal view returns (bytes memory);
+function stream() internal view returns (string memory);
 ```
 
 Use this for building advanced content logic.
@@ -37,12 +37,13 @@ Use this for building advanced content logic.
 
 Each of these extends `OnChainStorage` and implements a usage/access model.
 
-| Contract           | Description                          |
-| ------------------ | ------------------------------------ |
-| `BasicContent`     | Unlimited use, public view access    |
-| `CappedContent`    | Use limited by `maxUsage`            |
-| `PayPerUseContent` | Requires ETH payment per access      |
-| `WhitelistContent` | Only approved addresses may use/view |
+| Contract                  | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| `BasicContent`           | Unlimited use, public view access                |
+| `CappedContent`          | Use limited by `maxUsage`                        |
+| `PayPerUseContent`       | Requires ETH payment per access                  |
+| `WhitelistContent`       | Only approved addresses may use/view             |
+| `PayPerUseCappedContent` | Combined payment and usage limit requirements    |
 
 ### 🔸 Interface
 
@@ -81,6 +82,7 @@ Test scripts (in `test/store.js`) verify:
 - Finalization logic
 - Stream URI formatting
 - Gated `use()` behavior for each model
+- Combined access control models
 
 ## 📄 License
 

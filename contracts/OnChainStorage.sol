@@ -20,6 +20,7 @@ abstract contract OnChainStorage is Ownable {
     struct Info {
         string name;
         string version;
+        string mimeType;
         uint256 createdAt;
         string description;
     }
@@ -43,10 +44,12 @@ abstract contract OnChainStorage is Ownable {
     /// @param _owner Address that will own and control the content
     /// @param _finalized Whether to finalize content on creation
     constructor(
+        string memory mimeType,
         bytes memory initialChunk,
         address _owner,
         bool _finalized
     ) Ownable(_owner) {
+        info.mimeType = mimeType;
         chunks[0] = initialChunk;
         chunkCount = 1;
         finalized = _finalized;
@@ -134,6 +137,7 @@ abstract contract OnChainStorage is Ownable {
         returns (string memory base64Stream)
     {
         bytes memory fullData = assemble();
-        base64Stream = OnChainCodec.encodeOctetStream(fullData);
+        string memory mimeType = info.mimeType;
+        base64Stream = OnChainCodec.encodeWithMime(mimeType, fullData);
     }
 }

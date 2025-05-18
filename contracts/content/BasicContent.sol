@@ -10,16 +10,17 @@ contract BasicContent is OnChainStorage {
     uint256 internal usageCount;
 
     constructor(
+        string memory mimeType,
         bytes memory chunk,
         address _owner,
         bool _finalized
-    ) OnChainStorage(chunk, _owner, _finalized) {}
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {}
 
     /// @notice Register content use (unrestricted)
     function use() external returns (bool) {
         usageCount++;
         return true;
-    }   
+    }
 
     /// @notice Get current usage count
     function getUsageCount() external view returns (uint256) {
@@ -27,8 +28,24 @@ contract BasicContent is OnChainStorage {
     }
 
     /// @notice Get content metadata
-    function getInfo() external view returns (string memory name, string memory version, uint256 createdAt, string memory description) {
-        return (info.name, info.version, info.createdAt, info.description);
+    function getInfo()
+        external
+        view
+        returns (
+            string memory name,
+            string memory version,
+            string memory mimeType,
+            uint256 createdAt,
+            string memory description
+        )
+    {
+        return (
+            info.name,
+            info.version,
+            info.mimeType,
+            info.createdAt,
+            info.description
+        );
     }
 
     /// @notice Get content assembly

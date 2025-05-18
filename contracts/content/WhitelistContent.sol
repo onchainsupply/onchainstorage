@@ -16,10 +16,11 @@ contract WhitelistContent is OnChainStorage {
     }
 
     constructor(
+        string memory mimeType,
         bytes memory chunk,
         address _owner,
         bool _finalized
-    ) OnChainStorage(chunk, _owner, _finalized) {}
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {}
 
     function addToWhitelist(address user) external onlyOwner {
         whitelist[user] = true;
@@ -47,8 +48,25 @@ contract WhitelistContent is OnChainStorage {
     }
 
     /// @notice Get content metadata (whitelist restricted)
-    function getInfo() external view onlyWhitelisted returns (string memory name, string memory version, uint256 createdAt, string memory description) {
-        return (info.name, info.version, info.createdAt, info.description);
+    function getInfo()
+        external
+        view
+        onlyWhitelisted
+        returns (
+            string memory name,
+            string memory version,
+            string memory mimeType,
+            uint256 createdAt,
+            string memory description
+        )
+    {
+        return (
+            info.name,
+            info.version,
+            info.mimeType,
+            info.createdAt,
+            info.description
+        );
     }
 
     /// @notice Get content assembly (whitelist restricted)
@@ -57,7 +75,12 @@ contract WhitelistContent is OnChainStorage {
     }
 
     /// @notice Get content as data URI (whitelist restricted)
-    function getContentURI() external view onlyWhitelisted returns (string memory) {
+    function getContentURI()
+        external
+        view
+        onlyWhitelisted
+        returns (string memory)
+    {
         return stream();
     }
 
@@ -67,7 +90,9 @@ contract WhitelistContent is OnChainStorage {
     }
 
     /// @notice Get chunk at specific index (whitelist restricted)
-    function getChunk(uint256 index) external view onlyWhitelisted returns (bytes memory) {
+    function getChunk(
+        uint256 index
+    ) external view onlyWhitelisted returns (bytes memory) {
         require(index < chunkCount, "Invalid chunk index");
         return chunks[index];
     }

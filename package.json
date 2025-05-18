@@ -1,6 +1,6 @@
 {
   "name": "@onchainsupply/storage",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Encode/decode logic for fully onchain asset storage and tokenization",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,9 +29,7 @@
     "./contracts/*": "./contracts/*"
   },
   "dependencies": {
+    "@onchainsupply/storage": "^1.2.1",
     "@openzeppelin/contracts": "^5.3.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   }
 }

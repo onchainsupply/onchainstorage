@@ -18,12 +18,13 @@ contract PayPerUseCappedContent is OnChainStorage {
     }
 
     constructor(
+        string memory mimeType,
         bytes memory chunk,
         uint256 _payment,
         uint256 _maxUsage,
         address _owner,
         bool _finalized
-    ) OnChainStorage(chunk, _owner, _finalized) {
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {
         payment = _payment;
         maxUsage = _maxUsage;
     }
@@ -40,7 +41,12 @@ contract PayPerUseCappedContent is OnChainStorage {
         return usageCount;
     }
 
-    function use() external payable requiresPaymentAndWithinLimit returns (bool) {
+    function use()
+        external
+        payable
+        requiresPaymentAndWithinLimit
+        returns (bool)
+    {
         usageCount++;
         return true;
     }
@@ -58,36 +64,65 @@ contract PayPerUseCappedContent is OnChainStorage {
         returns (
             string memory name,
             string memory version,
+            string memory mimeType,
             uint256 createdAt,
             string memory description
         )
     {
-        return (info.name, info.version, info.createdAt, info.description);
+        return (
+            info.name,
+            info.version,
+            info.mimeType,
+            info.createdAt,
+            info.description
+        );
     }
 
     /// @notice Get content assembly (payment and usage limit required)
-    function getContent() external payable requiresPaymentAndWithinLimit returns (bytes memory) {
+    function getContent()
+        external
+        payable
+        requiresPaymentAndWithinLimit
+        returns (bytes memory)
+    {
         return assemble();
     }
 
     /// @notice Get content as data URI (payment and usage limit required)
-    function getContentURI() external payable requiresPaymentAndWithinLimit returns (string memory) {
+    function getContentURI()
+        external
+        payable
+        requiresPaymentAndWithinLimit
+        returns (string memory)
+    {
         return stream();
     }
 
     /// @notice Get chunk count (payment and usage limit required)
-    function getChunkCount() external payable requiresPaymentAndWithinLimit returns (uint256) {
+    function getChunkCount()
+        external
+        payable
+        requiresPaymentAndWithinLimit
+        returns (uint256)
+    {
         return chunkCount;
     }
 
     /// @notice Get chunk at specific index (payment and usage limit required)
-    function getChunk(uint256 index) external payable requiresPaymentAndWithinLimit returns (bytes memory) {
+    function getChunk(
+        uint256 index
+    ) external payable requiresPaymentAndWithinLimit returns (bytes memory) {
         require(index < chunkCount, "Invalid chunk index");
         return chunks[index];
     }
 
     /// @notice Check if content is finalized (payment and usage limit required)
-    function isFinalized() external payable requiresPaymentAndWithinLimit returns (bool) {
+    function isFinalized()
+        external
+        payable
+        requiresPaymentAndWithinLimit
+        returns (bool)
+    {
         return finalized;
     }
-} 
+}

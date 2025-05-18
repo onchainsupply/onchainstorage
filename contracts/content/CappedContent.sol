@@ -16,11 +16,12 @@ contract CappedContent is OnChainStorage {
     }
 
     constructor(
+        string memory mimeType,
         bytes memory chunk,
         uint256 _maxUsage,
         address _owner,
         bool _finalized
-    ) OnChainStorage(chunk, _owner, _finalized) {
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {
         maxUsage = _maxUsage;
     }
 
@@ -49,20 +50,37 @@ contract CappedContent is OnChainStorage {
         returns (
             string memory name,
             string memory version,
+            string memory mimeType,
             uint256 createdAt,
             string memory description
         )
     {
-        return (info.name, info.version, info.createdAt, info.description);
+        return (
+            info.name,
+            info.version,
+            info.mimeType,
+            info.createdAt,
+            info.description
+        );
     }
 
     /// @notice Get content assembly (usage capped)
-    function getContent() external view withinUsageLimit returns (bytes memory) {
+    function getContent()
+        external
+        view
+        withinUsageLimit
+        returns (bytes memory)
+    {
         return assemble();
     }
 
     /// @notice Get content as data URI (usage capped)
-    function getContentURI() external view withinUsageLimit returns (string memory) {
+    function getContentURI()
+        external
+        view
+        withinUsageLimit
+        returns (string memory)
+    {
         return stream();
     }
 
@@ -72,7 +90,9 @@ contract CappedContent is OnChainStorage {
     }
 
     /// @notice Get chunk at specific index (usage capped)
-    function getChunk(uint256 index) external view withinUsageLimit returns (bytes memory) {
+    function getChunk(
+        uint256 index
+    ) external view withinUsageLimit returns (bytes memory) {
         require(index < chunkCount, "Invalid chunk index");
         return chunks[index];
     }

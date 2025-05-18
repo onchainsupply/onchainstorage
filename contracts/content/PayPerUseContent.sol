@@ -16,11 +16,12 @@ contract PayPerUseContent is OnChainStorage {
     }
 
     constructor(
+        string memory mimeType,
         bytes memory chunk,
         uint256 _payment,
         address _owner,
         bool _finalized
-    ) OnChainStorage(chunk, _owner, _finalized) {
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {
         payment = _payment;
     }
 
@@ -49,30 +50,54 @@ contract PayPerUseContent is OnChainStorage {
         returns (
             string memory name,
             string memory version,
+            string memory mimeType,
             uint256 createdAt,
             string memory description
         )
     {
-        return (info.name, info.version, info.createdAt, info.description);
+        return (
+            info.name,
+            info.version,
+            info.mimeType,
+            info.createdAt,
+            info.description
+        );
     }
 
     /// @notice Get content assembly (payment required)
-    function getContent() external payable requiresPayment returns (bytes memory) {
+    function getContent()
+        external
+        payable
+        requiresPayment
+        returns (bytes memory)
+    {
         return assemble();
     }
 
     /// @notice Get content as data URI (payment required)
-    function getContentURI() external payable requiresPayment returns (string memory) {
+    function getContentURI()
+        external
+        payable
+        requiresPayment
+        returns (string memory)
+    {
         return stream();
     }
 
     /// @notice Get chunk count (payment required)
-    function getChunkCount() external payable requiresPayment returns (uint256) {
+    function getChunkCount()
+        external
+        payable
+        requiresPayment
+        returns (uint256)
+    {
         return chunkCount;
     }
 
     /// @notice Get chunk at specific index (payment required)
-    function getChunk(uint256 index) external payable requiresPayment returns (bytes memory) {
+    function getChunk(
+        uint256 index
+    ) external payable requiresPayment returns (bytes memory) {
         require(index < chunkCount, "Invalid chunk index");
         return chunks[index];
     }

@@ -76,4 +76,17 @@ library OnChainCodec {
             )
         );
     }
+
+    /// @notice Encodes data with a custom MIME type
+    /// @param data raw bytes to encode
+    /// @param mimeType the content type to declare in the data URI
+    /// @return uri RFC 2397 base64 encoded data URI string
+    function encodeWithMime(
+        string memory mimeType,
+        bytes memory data
+    ) internal pure returns (string memory uri) {
+        uri = string(
+            abi.encodePacked("data:", mimeType, ";base64,", Base64.encode(data))
+        );
+    }
 }

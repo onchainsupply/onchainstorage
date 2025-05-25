@@ -13,6 +13,9 @@ abstract contract OnChainStorage is Ownable {
     /// @notice Mapping from chunk index to actual chunk data
     mapping(uint256 => bytes) internal chunks;
 
+    /// @notice Total size in bytes of all content chunks
+    uint256 internal totalSize;
+
     /// @notice Flag to lock the content against further modification
     bool internal finalized;
 
@@ -52,6 +55,7 @@ abstract contract OnChainStorage is Ownable {
         info.mimeType = mimeType;
         chunks[0] = initialChunk;
         chunkCount = 1;
+        totalSize = initialChunk.length;
         finalized = _finalized;
         info.createdAt = block.timestamp;
         if (_finalized) {
@@ -76,6 +80,7 @@ abstract contract OnChainStorage is Ownable {
         require(!finalized, "Content is finalized");
         for (uint256 i = 0; i < data.length; i++) {
             chunks[chunkCount] = data[i];
+            totalSize += data[i].length;
             chunkCount++;
         }
         emit ChunksAppended(data.length);
@@ -93,8 +98,14 @@ abstract contract OnChainStorage is Ownable {
             delete chunks[i];
         }
         chunkCount = 0;
+        totalSize = 0;
         finalized = false;
         emit Reset();
+    }
+
+    /// @notice Returns the total size in bytes of stored content
+    function size() public view returns (uint256) {
+        return totalSize;
     }
 
     /// @notice Updates metadata information for the content

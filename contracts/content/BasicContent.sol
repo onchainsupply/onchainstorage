@@ -35,22 +35,22 @@ contract BasicContent is OnChainStorage {
         view
         returns (
             string memory name,
-            address owner,
+            address totalSize,
             string memory version,
             string memory mimeType,
             uint256 createdAt,
             string memory description,
-            uint256 totalSize
+            uint256 totalBytes
         )
     {
         return (
             info.name,
-            owner,
+            owner(),
             info.version,
             info.mimeType,
             info.createdAt,
             info.description,
-            totalSize
+            size()
         );
     }
 

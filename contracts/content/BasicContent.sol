@@ -8,6 +8,7 @@ import {OnChainStorage} from "../OnChainStorage.sol";
 /// @notice Open-access content with no usage limits or fees
 contract BasicContent is OnChainStorage {
     uint256 internal usageCount;
+    address[] public users;
 
     constructor(
         string memory mimeType,
@@ -19,6 +20,7 @@ contract BasicContent is OnChainStorage {
     /// @notice Register content use (unrestricted)
     function use() external returns (bool) {
         usageCount++;
+        users.push(msg.sender);
         return true;
     }
 
@@ -33,18 +35,22 @@ contract BasicContent is OnChainStorage {
         view
         returns (
             string memory name,
+            address owner,
             string memory version,
             string memory mimeType,
             uint256 createdAt,
-            string memory description
+            string memory description,
+            uint256 totalSize
         )
     {
         return (
             info.name,
+            owner(),
             info.version,
             info.mimeType,
             info.createdAt,
-            info.description
+            info.description,
+            totalSize
         );
     }
 

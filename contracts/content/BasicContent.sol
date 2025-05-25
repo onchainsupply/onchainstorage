@@ -45,7 +45,7 @@ contract BasicContent is OnChainStorage {
     {
         return (
             info.name,
-            owner(),
+            owner,
             info.version,
             info.mimeType,
             info.createdAt,

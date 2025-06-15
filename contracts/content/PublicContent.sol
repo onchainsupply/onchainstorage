@@ -22,8 +22,9 @@ contract PublicContent is OnChainStorage {
         string memory mimeType,
         bytes memory chunk,
         address _owner,
-        bool _finalized
-    ) OnChainStorage(mimeType, chunk, _owner, _finalized) {}
+        bool _finalized,
+        address _factory
+    ) OnChainStorage(mimeType, chunk, _owner, _finalized, _factory) {}
 
     /// @notice Register content use (unrestricted)
     function use() external returns (bool) {
@@ -88,23 +89,36 @@ contract PublicContent is OnChainStorage {
         return finalized;
     }
 
-    /// @notice Withdraw collected ETH
+    /// @notice Withdraw collected ETH with 5% fee sent to factory
     function withdraw() external onlyOwner {
         uint256 amount = address(this).balance;
         require(amount > 0, "No ETH to withdraw");
-        payable(owner()).transfer(amount);
-        emit Withdrawn(owner(), amount);
+        uint256 fee = (amount * 5) / 100;
+        uint256 payout = amount - fee;
+        if (fee > 0) {
+            payable(factory).transfer(fee);
+        }
+        payable(owner()).transfer(payout);
+        emit Withdrawn(owner(), payout);
     }
 
-    /// @notice Withdraw any ERC20 tokens sent to the contract
+    /// @notice Withdraw any ERC20 tokens sent to the contract with 5% fee to factory
     function withdrawToken(address token) external onlyOwner {
         uint256 balance = IERC20(token).balanceOf(address(this));
         require(balance > 0, "No token balance");
+        uint256 fee = (balance * 5) / 100;
+        uint256 payout = balance - fee;
+        if (fee > 0) {
+            require(
+                IERC20(token).transfer(factory, fee),
+                "Token fee transfer failed"
+            );
+        }
         require(
-            IERC20(token).transfer(owner(), balance),
+            IERC20(token).transfer(owner(), payout),
             "Token transfer failed"
         );
-        emit TokenWithdrawn(token, owner(), balance);
+        emit TokenWithdrawn(token, owner(), payout);
     }
 
     receive() external payable {}

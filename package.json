@@ -1,6 +1,6 @@
 {
   "name": "@onchainsupply/storage",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "description": "Encode/decode logic for fully onchain asset storage and tokenization",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

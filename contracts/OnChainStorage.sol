@@ -65,7 +65,7 @@ abstract contract OnChainStorage is Ownable {
         finalized = _finalized;
         info.mimeType = mimeType;
         info.createdAt = block.timestamp;
-        factory = _registry;
+        factory = _factory;
 
         if (_finalized) emit Finalized();
     }
